@@ -12,7 +12,7 @@ def calculate_euclidean_distance(px, py, index1, index2):
     :param index2: Node 2 index in the coordinate list.
     :return: Euclidean distance between node 1 and 2.
     """
-
+    # squreRoot( (x1-x2)^2 - (y1-y2)^2 )
     # TODO - Implement the euclidean distance function.
     xdiff = math.pow(px[index1]-px[index2], 2)
     ydiff = math.pow(py[index1]-py[index2], 2)
@@ -40,13 +40,14 @@ def calculate_total_distance(routes, px, py, depot):
         # one forward, one backward
         forward = calculate_euclidean_distance(px, py, depot, i[0])
         backward = calculate_euclidean_distance(px, py, i[len(i)-1], depot)
-        # then do the calcuateion from one state to the neighbor
+
+        totalTourDistance += forward + backward  # assign the value
+        # then do the calculation from one node to the neighbor
         for j in range(len(i)):
             if j < len(i)-1:
                 # add it
                 totalTourDistance += calculate_euclidean_distance(
                     px, py, i[j], i[j+1])
-        totalTourDistance += forward + backward
 
     return totalTourDistance
 
