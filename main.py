@@ -66,10 +66,10 @@ def nearest_neighbour_heuristic(px, py, demand, capacity, depot):
 
     # loop until all nodes are visited
     while len(node_index_list) > 0:
-        startNode = depot  # start at the depot node
+        startNode = depot  # each route start at the depot node
         visited_invalid_Nodes = []
         temp_route = []
-        # loop through all nodes to find the route until no feasible node is found for the current route
+        # loop through all nodes to find a route until no feasible node is found for the current route
         for time in range(len(node_index_list)):
             node_id_index = -1  # index of the nearest node of current start node
             nearest_distance = 9999999999999999
@@ -121,8 +121,13 @@ def savings_heuristic(px, py, demand, capacity, depot):
     """
 
     # TODO - Implement the Saving Heuristic to generate VRP solutions.
+    routes_to_return = []
+    
+    
+    
+    
 
-    return None
+    return routes_to_return
 
 
 if __name__ == '__main__':
