@@ -36,7 +36,7 @@ def calculate_total_distance(routes, px, py, depot):
     totalTourDistance = 0
 
     # loop through all possible routes
-    for i in (routes):
+    for i in routes:
         # one forward, one backward
         forward = calculate_euclidean_distance(px, py, depot, i[0])
         backward = calculate_euclidean_distance(px, py, i[len(i)-1], depot)

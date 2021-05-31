@@ -120,13 +120,6 @@ def savings_heuristic(px, py, demand, capacity, depot):
     :param depot: Depot.
     :return: List of vehicle routes (tours).
     """
-    # map = {}
-    # for i in range(1, len(px)):
-    #     map[i] = i
-    # print(map)
-    # if 1 == 1:
-    #     return
-
     # TODO - Implement the Saving Heuristic to generate VRP solutions.
     routes_to_return = []
 
@@ -163,54 +156,51 @@ def savings_heuristic(px, py, demand, capacity, depot):
     # the Algorithm lookes like Kruskal from Minimum Spanning Tree
     # loop until there is only one route left in the forest
     # OR the FringeQueue is empty
-    while len(initial_routes_forest) > 1 or fringeQueue:
+    while len(initial_routes_forest.keys()) > 1 or fringeQueue.qsize() > 0 or not fringeQueue.empty():
+        if fringeQueue.empty():
+            break
         # get and remove the fringe with the highest saving cost
         fringe = fringeQueue.get()
-        # print(fringe)
 
         root1 = findRootNode(fringe.node1[0], fatherMap)
         root2 = findRootNode(fringe.node2[0], fatherMap)
 
+        # if root1 == root2:
+        #     print("same")
         # check if the 2 nodes from fringe are already be merged or not
-        if root1 == root2:
+        if root1 != root2:
             # check the capacity after merged, if it is within the capacity, then merge them
             allDemands = 0
-            for i in initial_routes_forest[root1]:
+            for i in initial_routes_forest.get(root1):
                 allDemands += demand[i]
-            for i in initial_routes_forest[root2]:
+            for i in initial_routes_forest.get(root2):
                 allDemands += demand[i]
+
+            # print("total demand is:",allDemands,"\nCapacity is:"+capacity)
             if allDemands > capacity:
                 continue  # not a valid merge option, skip
 
-            # meet condition, so merge them into 1 routes
+            # # meet condition, so merge them into 1 routes
             root1_route_size = route_size_map[root1]
             root2_route_size = route_size_map[root2]
             # if root1_route_size < root2_route_size:
             fatherMap[root1] = root2  # update the value of the key
-
             route_to_add = initial_routes_forest.pop(
                 root1)  # remove the route from the forest
-            old = initial_routes_forest[root2]
-            initial_routes_forest[root2] = old.append(route_to_add)
-            # initial_routes_forest
+            newValue = initial_routes_forest[root2] + route_to_add
+            initial_routes_forest[root2] = newValue
+    print("finish")
 
-            # else:
-            # fatherMap[root2] = root1
-            # int aSetSize = sizeMap.get(aDai);
-            #     int bSetSize = sizeMap.get(bDai);
-            #     if (aSetSize <= bSetSize) {
-            #         fatherMap.put(aDai, bDai);// a的父节点是b集合的代表，也就是合并
-            #         sizeMap.put(bDai, aSetSize + bSetSize);
-            #         sizeMap.remove(aDai);// remove掉，也就是合并！
-            #     } else {
-            #         fatherMap.put(bDai, aDai);
-            #         sizeMap.put(aDai, aSetSize + bSetSize);
-            #         sizeMap.remove(bDai);
-            #     }
-            # routes_to_return.append()
-            # break
+    # for i in initial_routes_forest.values():
+    #     routes_to_return+=i
+    print(initial_routes_forest.values())
+    returnList=[]
 
-    return initial_routes_forest[0]
+    for i in initial_routes_forest.values():
+        returnList.append(i)
+    print(returnList)
+    return returnList
+    # return initial_routes_forest.values()
 
 
 def findRootNode(node, fatherMap):
@@ -227,10 +217,12 @@ def findRootNode(node, fatherMap):
     """
     fatherNode = fatherMap.get(node)
     if fatherNode == node:
+        # print("\nfinish find root, normal")
         return node
     else:
         # recuresive to find the root
         rootNode = findRootNode(fatherNode, fatherMap)
+        # print("\nfinish find root, recursive")
         return rootNode
 
 # def get_eachMerge_to_savingCost_map(px, py,  depot):
