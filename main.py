@@ -38,9 +38,9 @@ def main():
     # Uncomment it to do your assignment!
 
     sh_solution = savings_heuristic(px, py, demand, capacity, depot)
-    # sh_distance = utility.calculate_total_distance(sh_solution, px, py, depot)
-    # print("Saving VRP Heuristic Distance:", sh_distance)
-    # utility.visualise_solution(sh_solution, px, py, depot, "Savings Heuristic")
+    sh_distance = utility.calculate_total_distance(sh_solution, px, py, depot)
+    print("Saving VRP Heuristic Distance:", sh_distance)
+    utility.visualise_solution(sh_solution, px, py, depot, "Savings Heuristic")
 
 
 def nearest_neighbour_heuristic(px, py, demand, capacity, depot):
@@ -131,7 +131,7 @@ def savings_heuristic(px, py, demand, capacity, depot):
 
     # initialise routes (depot->node->depot) for each node except depot node
     # each element represent the list of nodes(i.e. routes)
-    initial_routes_forest = []
+    initial_routes_forest = {}
     fatherMap = {}  # map the node to its father
 
     route_size_map = {}  # the size of each route, actually, this variable is not compulsory,
@@ -140,7 +140,7 @@ def savings_heuristic(px, py, demand, capacity, depot):
         if i == depot:
             continue
         else:
-            initial_routes_forest.append([i])
+            initial_routes_forest.setdefault(i, [i])
             # initially, the father of the node is itself
             # and the size of each route is 1
             fatherMap.setdefault(i, i)
@@ -148,8 +148,8 @@ def savings_heuristic(px, py, demand, capacity, depot):
 
     # the fringe priority queue for storing the savings for each possible route
     fringeQueue = queue.PriorityQueue()
-    for i in initial_routes_forest:
-        for j in initial_routes_forest:
+    for i in initial_routes_forest.values():
+        for j in initial_routes_forest.values():
             if i == j:  # possible merge can not be itself
                 continue
             else:
@@ -172,33 +172,39 @@ def savings_heuristic(px, py, demand, capacity, depot):
         if root1 == root2:
             # check the capacity after merged, if it is within the capacity, then merge them
             allDemands = 0
-
+            for i in initial_routes_forest[root1]:
+                allDemands += demand[i]
+            for i in initial_routes_forest[root2]:
+                allDemands += demand[i]
             if allDemands > capacity:
-                continue
+                continue  # not a valid merge option, skip
 
             # meet condition, so merge them into 1 routes
             root1_route_size = route_size_map[root1]
             root2_route_size = route_size_map[root2]
-            if root1_route_size < root2_route_size:
-                fatherMap[root1] = root2  # update the value of the key
-                routes
-                initial_routes_forest.remove([root1])
+            # if root1_route_size < root2_route_size:
+            fatherMap[root1] = root2  # update the value of the key
 
-            else:
-                fatherMap[root2] = root1
-                # int aSetSize = sizeMap.get(aDai);
-                #     int bSetSize = sizeMap.get(bDai);
-                #     if (aSetSize <= bSetSize) {
-                #         fatherMap.put(aDai, bDai);// a的父节点是b集合的代表，也就是合并
-                #         sizeMap.put(bDai, aSetSize + bSetSize);
-                #         sizeMap.remove(aDai);// remove掉，也就是合并！
-                #     } else {
-                #         fatherMap.put(bDai, aDai);
-                #         sizeMap.put(aDai, aSetSize + bSetSize);
-                #         sizeMap.remove(bDai);
-                #     }
-                # routes_to_return.append()
-            break
+            route_to_add = initial_routes_forest.pop(
+                root1)  # remove the route from the forest
+            old = initial_routes_forest[root2]
+            initial_routes_forest[root2] = old.append(route_to_add)
+
+            # else:
+            # fatherMap[root2] = root1
+            # int aSetSize = sizeMap.get(aDai);
+            #     int bSetSize = sizeMap.get(bDai);
+            #     if (aSetSize <= bSetSize) {
+            #         fatherMap.put(aDai, bDai);// a的父节点是b集合的代表，也就是合并
+            #         sizeMap.put(bDai, aSetSize + bSetSize);
+            #         sizeMap.remove(aDai);// remove掉，也就是合并！
+            #     } else {
+            #         fatherMap.put(bDai, aDai);
+            #         sizeMap.put(aDai, aSetSize + bSetSize);
+            #         sizeMap.remove(bDai);
+            #     }
+            # routes_to_return.append()
+            # break
 
     return routes_to_return
 
