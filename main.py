@@ -120,30 +120,31 @@ def savings_heuristic(px, py, demand, capacity, depot):
     :param depot: Depot.
     :return: List of vehicle routes (tours).
     """
+    # map = {}
+    # for i in range(1, len(px)):
+    #     map[i] = i
+    # print(map)
+    # if 1 == 1:
+    #     return
 
     # TODO - Implement the Saving Heuristic to generate VRP solutions.
     routes_to_return = []
 
     # first, do the initiial set up
-    node_list = []
-    for i in range(1, len(px)):  # discount index 0
-        node_list.append(i)
-
     # initialise routes (depot->node->depot) for each node except depot node
     # each element represent the list of nodes(i.e. routes)
     initial_routes_forest = {}
     fatherMap = {}  # map the node to its father
-
     route_size_map = {}  # the size of each route, actually, this variable is not compulsory,
     #                         the purpose of route_size map is reducing the time complexity
-    for i in node_list:
+    for i in range(1, len(px)):  # discount index 0
         if i == depot:
             continue
         else:
             initial_routes_forest.setdefault(i, [i])
             # initially, the father of the node is itself
             # and the size of each route is 1
-            fatherMap.setdefault(i, i)
+            fatherMap[i] = i
             route_size_map.setdefault(i, 0)
 
     # the fringe priority queue for storing the savings for each possible route
@@ -165,9 +166,11 @@ def savings_heuristic(px, py, demand, capacity, depot):
     while len(initial_routes_forest) > 1 or fringeQueue:
         # get and remove the fringe with the highest saving cost
         fringe = fringeQueue.get()
+        # print(fringe)
 
-        root1 = findRootNode(fringe.node1, fatherMap)
-        root2 = findRootNode(fringe.node2, fatherMap)
+        root1 = findRootNode(fringe.node1[0], fatherMap)
+        root2 = findRootNode(fringe.node2[0], fatherMap)
+
         # check if the 2 nodes from fringe are already be merged or not
         if root1 == root2:
             # check the capacity after merged, if it is within the capacity, then merge them
@@ -189,6 +192,7 @@ def savings_heuristic(px, py, demand, capacity, depot):
                 root1)  # remove the route from the forest
             old = initial_routes_forest[root2]
             initial_routes_forest[root2] = old.append(route_to_add)
+            # initial_routes_forest
 
             # else:
             # fatherMap[root2] = root1
@@ -206,7 +210,7 @@ def savings_heuristic(px, py, demand, capacity, depot):
             # routes_to_return.append()
             # break
 
-    return routes_to_return
+    return initial_routes_forest[0]
 
 
 def findRootNode(node, fatherMap):
@@ -221,11 +225,12 @@ def findRootNode(node, fatherMap):
     Returns:
         nodeIndex: root node of the route 
     """
-    if fatherMap[node] == node:
+    fatherNode = fatherMap.get(node)
+    if fatherNode == node:
         return node
     else:
         # recuresive to find the root
-        rootNode = findRootNode(fatherMap[node], fatherMap)
+        rootNode = findRootNode(fatherNode, fatherMap)
         return rootNode
 
 # def get_eachMerge_to_savingCost_map(px, py,  depot):
