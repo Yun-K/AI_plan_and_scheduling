@@ -132,35 +132,95 @@ def savings_heuristic(px, py, demand, capacity, depot):
     # initialise routes (depot->node->depot) for each node except depot node
     # each element represent the list of nodes(i.e. routes)
     initial_routes_forest = []
+    fatherMap = {}  # map the node to its father
+
+    route_size_map = {}  # the size of each route, actually, this variable is not compulsory,
+    #                         the purpose of route_size map is reducing the time complexity
     for i in node_list:
         if i == depot:
             continue
         else:
             initial_routes_forest.append([i])
+            # initially, the father of the node is itself
+            # and the size of each route is 1
+            fatherMap.setdefault(i, i)
+            route_size_map.setdefault(i, 0)
 
-    #
+    # the fringe priority queue for storing the savings for each possible route
     fringeQueue = queue.PriorityQueue()
     for i in initial_routes_forest:
         for j in initial_routes_forest:
-            if i == j:
+            if i == j:  # possible merge can not be itself
                 continue
             else:
                 fringeQueue.put(
                     (Fringe(i, j, get_saving_cost_for_mergeRoutes(px, py, i, j, depot))))
+    # while fringeQueue:
+    #     t=fringeQueue.get()
+    #     print(t)#debug
 
-    while fringeQueue:
-        t=fringeQueue.get()
-        print(t)
-    # in python, the key can not be list,so the associated saving cost value can not be set,use the PriorityQueue instead, which is at top
-    # merge_savingCost_map = {}  # the java map, map each merge to it's saving cost
+    # the Algorithm lookes like Kruskal from Minimum Spanning Tree
+    # loop until there is only one route left in the forest
+    # OR the FringeQueue is empty
+    while len(initial_routes_forest) > 1 or fringeQueue:
+        # get and remove the fringe with the highest saving cost
+        fringe = fringeQueue.get()
 
-    # the Algorithm lookes like one of the Minimum Spanning Tree
-    # loop until there is only one route left
-    # while len(initial_routes_forest) > 1:
-    #     for
+        root1 = findRootNode(fringe.node1, fatherMap)
+        root2 = findRootNode(fringe.node2, fatherMap)
+        # check if the 2 nodes from fringe are already be merged or not
+        if root1 == root2:
+            # check the capacity after merged, if it is within the capacity, then merge them
+            allDemands = 0
+
+            if allDemands > capacity:
+                continue
+
+            # meet condition, so merge them into 1 routes
+            root1_route_size = route_size_map[root1]
+            root2_route_size = route_size_map[root2]
+            if root1_route_size < root2_route_size:
+                fatherMap[root1] = root2  # update the value of the key
+                routes
+                initial_routes_forest.remove([root1])
+
+            else:
+                fatherMap[root2] = root1
+                # int aSetSize = sizeMap.get(aDai);
+                #     int bSetSize = sizeMap.get(bDai);
+                #     if (aSetSize <= bSetSize) {
+                #         fatherMap.put(aDai, bDai);// a的父节点是b集合的代表，也就是合并
+                #         sizeMap.put(bDai, aSetSize + bSetSize);
+                #         sizeMap.remove(aDai);// remove掉，也就是合并！
+                #     } else {
+                #         fatherMap.put(bDai, aDai);
+                #         sizeMap.put(aDai, aSetSize + bSetSize);
+                #         sizeMap.remove(bDai);
+                #     }
+                # routes_to_return.append()
+            break
 
     return routes_to_return
 
+
+def findRootNode(node, fatherMap):
+    """ find the root node of the given argument
+
+    This method if for checking whether or not two nodes are in the same routes or not. SInce if they are in the same route, they can not be merged.
+
+    Args:
+        node (nodeIndex): the node that need to be found the index
+        fatherMap (map): the map that map each node with its parents
+
+    Returns:
+        nodeIndex: root node of the route 
+    """
+    if fatherMap[node] == node:
+        return node
+    else:
+        # recuresive to find the root
+        rootNode = findRootNode(fatherMap[node], fatherMap)
+        return rootNode
 
 # def get_eachMerge_to_savingCost_map(px, py,  depot):
 #     """Return the map that map each possible merge to it's saving cost.
