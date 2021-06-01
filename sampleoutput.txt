@@ -1,3 +1,9 @@
-Best VRP Distance: 787.8082774366646
-Nearest Neighbour VRP Heuristic Distance: 1146.3996317253793
-Saving VRP Heuristic Distance: 994.34502158848
+n32-k5:
+    Best VRP Distance: 787.8082774366646
+    Nearest Neighbour VRP Heuristic Distance: 1146.3996317253793
+    Saving VRP Heuristic Distance: 994.3450215884798
+
+n80-k10:
+    Best VRP Distance: 1766.4999433704206
+    Nearest Neighbour VRP Heuristic Distance: 2255.461886842153
+    Saving VRP Heuristic Distance: 2112.4403288388535

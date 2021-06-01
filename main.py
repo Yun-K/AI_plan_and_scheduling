@@ -11,8 +11,8 @@ def main():
     vrp_file = "data/n32-k5.vrp"  # "data/n80-k10.vrp"
     sol_file = "data/n32-k5.sol"  # "data/n80-k10.sol"
 
-    # vrp_file = "data/n80-k10.vrp"
-    # sol_file = "data/n80-k10.sol"
+    vrp_file = "data/n80-k10.vrp"
+    sol_file = "data/n80-k10.sol"
 
     # Loading the VRP data file.
     px, py, demand, capacity, depot = loader.load_data(vrp_file)
@@ -121,8 +121,6 @@ def savings_heuristic(px, py, demand, capacity, depot):
     :return: List of vehicle routes (tours).
     """
     # TODO - Implement the Saving Heuristic to generate VRP solutions.
-    routes_to_return = []
-
     # first, do the initiial set up
     # initialise routes (depot->node->depot) for each node except depot node
     # each element represent the list of nodes(i.e. routes)
@@ -156,8 +154,8 @@ def savings_heuristic(px, py, demand, capacity, depot):
     # the Algorithm lookes like Kruskal from Minimum Spanning Tree
     # loop until there is only one route left in the forest
     # OR the FringeQueue is empty
-    while len(initial_routes_forest.keys()) > 1 or fringeQueue.qsize() > 0 or not fringeQueue.empty():
-        if fringeQueue.empty():
+    while len(initial_routes_forest.keys()) > 1 or fringeQueue.qsize() > 0:
+        if fringeQueue.empty():  # don't know why need this if check, strange'
             break
         # get and remove the fringe with the highest saving cost
         fringe = fringeQueue.get()
@@ -171,9 +169,12 @@ def savings_heuristic(px, py, demand, capacity, depot):
         if root1 != root2:
             # check the capacity after merged, if it is within the capacity, then merge them
             allDemands = 0
-            for i in initial_routes_forest.get(root1):
-                allDemands += demand[i]
-            for i in initial_routes_forest.get(root2):
+            # for i in initial_routes_forest.get(root1):
+            #     allDemands += demand[i]
+            # for i in initial_routes_forest.get(root2):
+            #     allDemands += demand[i]
+
+            for i in initial_routes_forest.get(root1) + initial_routes_forest.get(root2):
                 allDemands += demand[i]
 
             # print("total demand is:",allDemands,"\nCapacity is:"+capacity)
@@ -183,23 +184,32 @@ def savings_heuristic(px, py, demand, capacity, depot):
             # # meet condition, so merge them into 1 routes
             root1_route_size = route_size_map[root1]
             root2_route_size = route_size_map[root2]
-            # if root1_route_size < root2_route_size:
-            fatherMap[root1] = root2  # update the value of the key
-            route_to_add = initial_routes_forest.pop(
-                root1)  # remove the route from the forest
-            newValue = initial_routes_forest[root2] + route_to_add
-            initial_routes_forest[root2] = newValue
-    print("finish")
+            if root1_route_size < root2_route_size:
+                route_size_map[root2] = root2_route_size+root1_route_size
+                route_size_map.pop(root1)
+                fatherMap[root1] = root2  # update the value of the key
+                route_to_add = initial_routes_forest.pop(
+                    root1)  # remove the route from the forest
+                newValue = initial_routes_forest[root2] + \
+                    list(reversed(route_to_add))
+                initial_routes_forest[root2] = newValue
+            else:
+                route_size_map[root1] = root2_route_size+root1_route_size
+                route_size_map.pop(root2)
 
-    # for i in initial_routes_forest.values():
-    #     routes_to_return+=i
-    print(initial_routes_forest.values())
-    returnList=[]
+                fatherMap[root2] = root1  # update the value of the key
+                route_to_add = initial_routes_forest.pop(
+                    root2)  # remove the route from the forest
+                newValue = initial_routes_forest[root1] + \
+                    list(reversed(route_to_add))
+                initial_routes_forest[root1] = newValue
+    # print("finish")
 
+    routes_to_return = []
     for i in initial_routes_forest.values():
-        returnList.append(i)
-    print(returnList)
-    return returnList
+        routes_to_return.append(i)
+    # print(routes_to_return)
+    return routes_to_return
     # return initial_routes_forest.values()
 
 
