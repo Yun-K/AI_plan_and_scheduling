@@ -7,3 +7,11 @@ n80-k10:
     Best VRP Distance: 1766.4999433704206
     Nearest Neighbour VRP Heuristic Distance: 2255.461886842153
     Saving VRP Heuristic Distance: 2112.4403288388535
+
+
+Others:
+    n32-k5:
+        src % python3 main.py
+        Best VRP Distance: 787.8082774366646
+        Nearest Neighbour VRP Heuristic Distance: 1146.399631725379
+        Saving VRP Heuristic Distance: 843.6881693466269
