@@ -1,5 +1,5 @@
 # Description：
-The topic of this assignment is Planning and Scheduling, the code part which is aiming for solving the _VRP problem_ which is samiliar as the Travelling Salesman Problem(aka TSP).
+The topic of this COMP307 assignment 4 is Planning and Scheduling, the code part which is aiming for solving the _VRP problem_ which is samiliar as the Travelling Salesman Problem(aka TSP).
 
 # Brief Explaniation of VRP：
 In this assignment, there are lots of nodes, one node represents the depot, others are all the client nodes, and each client node has a demand value. The purpose is try to find the nearest routes that can deliver goods to satisfy all clients.
